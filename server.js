@@ -26,6 +26,10 @@ app.use(express.json());
 const allowedOrigin = process.env.FRONTEND_ORIGIN || '*';
 app.use(cors({ origin: allowedOrigin }));
 
+app.get('/', (req, res) => {
+  res.json({ ok: true, servico: 'locadora-backend' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, servico: 'locadora-backend', hora: new Date().toISOString() });
 });
