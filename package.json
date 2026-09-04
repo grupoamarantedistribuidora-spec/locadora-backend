@@ -1,0 +1,17 @@
+{
+  "name": "locadora-backend",
+  "version": "1.0.0",
+  "description": "Backend mínimo pra guardar credenciais reais (Cora, Infosimples) fora do navegador e expor endpoints seguros pro protótipo consumir.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0"
+  }
+}
