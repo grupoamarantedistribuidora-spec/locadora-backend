@@ -36,6 +36,8 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/cora', require('./routes/cora'));
 app.use('/api/consultas', require('./routes/infosimples'));
+app.use('/api/zapsign', require('./routes/zapsign'));
+app.use('/api/fiscal', require('./routes/fiscal'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
