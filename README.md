@@ -1,4 +1,4 @@
-# Backend do Locadora OS (Cora + Infosimples)
+# Backend do Locadora OS (Cora + Infosimples + ZapSign + Fiscal)
 
 Servidor pequeno cuja única função é seguar as credenciais que **não podem** ficar dentro do
 `prototipo_cadastro.html` (que é um arquivo estático, aberto no navegador — qualquer segredo
@@ -19,10 +19,14 @@ grátis limitada, não movimenta dinheiro nem dado pago).
 | `POST /api/consultas/telefone-endereco` | Validar telefone/endereço | Devolve resultado simulado |
 | `POST /api/consultas/protesto-acoes` | Protestos e ações judiciais | Devolve resultado simulado |
 | `POST /api/consultas/cheque-sem-fundo` | CCF (Bacen) | Devolve resultado simulado |
+| `POST /api/zapsign/enviar` | Enviar contrato pra assinatura eletrônica | Devolve link de assinatura simulado |
+| `GET /api/zapsign/status/:token` | Consultar status de uma assinatura | Devolve status simulado |
+| `POST /api/fiscal/emitir` | Emitir NFC-e/NF-e da Frente de caixa | Devolve nota simulada |
 
 Ou seja: dá pra subir isso HOJE, sem nenhuma credencial real, e ele funciona exatamente como o
 mock que já existe no front-end — só que agora com um lugar pronto pra colocar as credenciais
-reais assim que você contratar o Cora e a Infosimples, sem precisar tocar no front-end de novo.
+reais assim que você contratar o Cora, a Infosimples, a ZapSign e um provedor fiscal, sem
+precisar tocar no front-end de novo.
 
 ## Rodando local
 
@@ -74,7 +78,25 @@ existe na tela de Integrações.
   `.gitignore` já bloqueia os dois.
 - Troque `FRONTEND_ORIGIN=*` pela URL real do seu site assim que ele estiver publicado, pra só
   esse site poder chamar o backend.
-- Confirme os nomes exatos dos endpoints do Cora e da Infosimples na documentação oficial deles
-  antes de apontar pra produção — este código foi escrito com base no padrão documentado
-  publicamente (OAuth2 + mTLS pro Cora, token por query string pra Infosimples), mas cada
-  provedor pode ajustar detalhes com o tempo.
+- Confirme os nomes exatos dos endpoints do Cora, da Infosimples e da ZapSign na documentação
+  oficial deles antes de apontar pra produção — este código foi escrito com base no padrão
+  documentado publicamente (OAuth2 + mTLS pro Cora, token por query string pra Infosimples,
+  Bearer token pra ZapSign), mas cada provedor pode ajustar detalhes com o tempo.
+
+## Pendências conhecidas do módulo ZapSign
+
+O `POST /api/zapsign/enviar` está pronto pra receber o token e enviar o documento, mas hoje ele
+manda `base64_pdf: null` — falta decidir de onde vem o PDF do contrato (gerar um PDF real do
+contrato a partir do template do front-end, ou hospedar o texto em algum lugar e mandar a URL
+via `url_pdf`). Sem isso preenchido, a chamada real vai falhar mesmo com o token configurado —
+por enquanto ele continua no modo simulado até isso ser decidido.
+
+## Pendências conhecidas do módulo Fiscal (NF-e/NFC-e)
+
+O `POST /api/fiscal/emitir` segue o padrão da API da Focus NFe como referência, mas **emitir nota
+fiscal de verdade não depende só deste código** — depende de você (ou o cliente que comprar o
+sistema) ter, no provedor fiscal escolhido: CNPJ cadastrado, certificado digital A1 (.pfx)
+enviado pra eles, e ambiente de produção liberado (isso é exigência da Receita Federal/SEFAZ de
+cada estado, não do sistema). Além disso, os campos fiscais de cada item (CFOP, NCM, CSOSN/CST,
+alíquotas) dependem do regime tributário de cada empresa e não estão preenchidos aqui — precisam
+ser ajustados caso a caso antes de emitir em produção. Até lá, a emissão continua simulada.
